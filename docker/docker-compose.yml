@@ -1,0 +1,61 @@
+###############################################################################
+#                          Generated on phpdocker.io                          #
+###############################################################################
+version: "3.1"
+services:
+
+    mysql:
+      image: mysql:8.0
+      container_name: holimana-mysql
+      volumes:
+        - ../:/var/www/holimana
+      environment:
+        - MYSQL_ROOT_PASSWORD=root
+        - MYSQL_DATABASE=holimana
+        - MYSQL_USER=holimana_userdb
+        - MYSQL_PASSWORD=holimana_userpw
+      ports:
+        - '3307:3306'
+      networks:
+        - database
+
+    php-fpm:
+      build: php-fpm
+      ports:
+        - '9002:9000'
+      container_name: holimana-php-fpm
+      links:
+        - mysql
+      volumes:
+        - ../:/var/www/holimana
+        - ./logs/holimana:/var/www/holimana/var/log:cached
+      networks:
+        - server
+        - database
+
+    nginx:
+      build: nginx
+      container_name: holimana-nginx
+      volumes:
+        - ./logs/nginx:/var/log/nginx:cached
+        - ../:/var/www/holimana:cached
+      ports:
+        - '8080:80'
+      links:
+        - php-fpm
+      networks:
+        - server
+
+    chrome:
+      container_name: holimana-chrome
+      hostname: chrome
+      image: selenium/standalone-chrome-debug:latest
+      network_mode: 'host'
+      ports: ['5900:5900']
+      volumes:
+        - '/dev/shm:/dev/shm'
+
+              
+networks:
+  database:
+  server:

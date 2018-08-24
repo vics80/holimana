@@ -1,0 +1,70 @@
+    ###############################################################################
+#                          Generated on phpdocker.io                          #
+###############################################################################
+version: "3.1"
+services:
+
+    mysql:
+      image: mysql:8.0
+      container_name: sf4test-mysql
+      volumes:
+        - ../:/var/www/sf4test
+      environment:
+        - MYSQL_ROOT_PASSWORD=root
+        - MYSQL_DATABASE=sf4test
+        - MYSQL_USER=dbuser
+        - MYSQL_PASSWORD=dbpw
+      ports:
+        - "3307:3306"
+
+    php-fpm:
+      build: php-fpm
+      ports:
+        - "9002:9000"
+      container_name: sf4test-php-fpm
+      links:
+        - mysql
+      volumes:
+        - ../:/var/www/sf4test
+        - ./logs/sf4test:/var/www/sf4test/var/logs:cached
+
+    nginx:
+      image: nginx:latest
+      container_name: sf4test-nginx      
+      volumes:
+        - ./logs/nginx:/var/log/nginx:cached
+        - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+        - ./nginx/sf4.test.conf:/etc/nginx/conf.d/sf4.test.conf
+      ports:
+        - "80:8080"
+      links:
+        - php-fpm
+
+    codecept:
+      image: codeception/codeception
+      container_name: sf4test-codeception
+      volumes:
+        - .:/var/www/sf4test
+      depends_on:
+        - firefox
+        - chrome
+    firefox:
+      image: selenium/standalone-firefox-debug:latest
+      ports:
+        - 5900
+      # workaround for Docker for Mac, see https://github.com/SeleniumHQ/docker-selenium/issues/227#issuecomment-224865735
+      dns: 8.8.4.4
+      environment:
+        - no_proxy=localhost
+    chrome:
+      container_name: sf4test-chrome
+      hostname: chrome
+      image: selenium/standalone-chrome-debug:latest
+      network_mode: 'host'
+      ports: ['5900:5900']
+      volumes:
+        - /dev/shm:/dev/shm
+volumes:
+     - ../:/var/www/sf4test:cached
+
+              
