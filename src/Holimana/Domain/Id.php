@@ -15,11 +15,27 @@ class Id
 {
     private $id;
 
+    /**
+     * Id constructor.
+     * @param null $id
+     */
     public function __construct($id = null)
     {
         $this->id = null === $id ? Uuid::uuid4()->toString() : $id;
     }
 
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->id;
+    }
+
+    /**
+     * @param Id $id
+     * @return bool
+     */
     public function equals(Id $id)
     {
         return $this->id() === $id->id();

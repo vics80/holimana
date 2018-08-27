@@ -1,0 +1,35 @@
+Holimana\Domain\User\User:
+  type: entity
+  table: "user"
+  id:
+    id:
+      type: UserId
+      length: 11
+      generator: { strategy: AUTO }
+      unsigned: true
+      primary: true
+  fields:
+    firstname:
+      type: string
+      nullable: false
+      length: 50
+    lastname:
+      type: string
+      nullable: false
+      length: 50
+    email:
+      type: string
+      nullable: true
+      length: 100
+    password:
+      type: string
+      nullable: false
+      length: 255
+  oneToMany:
+    days:
+      targetEntity: Holimana\Domain\Day\Day
+      cascade: ["all"]
+      mappedBy: user
+      joinColumn:
+        name:  id
+        referencedColumnName: user_id

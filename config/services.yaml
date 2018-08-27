@@ -32,3 +32,32 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    #########################
+    ###--EVENT PUBLISHER--###
+    #########################
+    Holimana\Infrastructure\Event\DomainEventPublisher:
+        class: Holimana\Infrastructure\Event\DomainEventPublisher
+#        arguments: ['@Holimana\Infrastructure\Event\EventProducerFactory', '%env(QUEUE_SERVICE)%']
+#        calls:
+#        - ['subscribe', ['@Itv\Application\DomainEvent\OrderCreatedSubscriber']]
+#        - ['subscribe', ['@Itv\Application\DomainEvent\CompanyAffiliationChangedSubscriber']]
+
+    #########################
+    ###--REPOSITORY--###
+    #########################
+    Holimana\Infrastructure\Persistence\Doctrine\Repository\DoctrineUserRepository:
+        class: Holimana\Infrastructure\Persistence\Doctrine\Repository\DoctrineUserRepository
+        autowire: true
+        arguments: ['@doctrine.orm.default_entity_manager', '@Holimana\Infrastructure\Event\DomainEventPublisher']
+
+
+    #########################
+    ###--COMMAND HANDLER--###
+    #########################
+    holimana.user.list_users_handler:
+        class: Holimana\Application\Command\User\ListUsersHandler
+        tags:
+        - { name: tactician.handler, typehints: true }
+        arguments:
+        - '@Holimana\Infrastructure\Persistence\Doctrine\Repository\DoctrineUserRepository'

@@ -2,9 +2,14 @@
 
 namespace App\Controller;
 
-use Holimana\Domain\User;
+use Holimana\Application\Command\User\ListUsers;
+use Holimana\Domain\Event\DomainEvent;
+use Holimana\Domain\Event\DomainEventSubscriber;
+use Holimana\Domain\Event\EventPublisher;
+use Holimana\Domain\User\User;
 use App\Form\UserType;
-use App\Repository\UserRepository;
+use Holimana\Infrastructure\Persistence\Doctrine\Repository\DoctrineUserRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,14 +18,15 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/user")
  */
-class UserController extends Controller
+class UserController extends BaseController
 {
     /**
      * @Route("/", name="user_index", methods="GET")
      */
-    public function index(UserRepository $userRepository): Response
+    public function index(): Response
     {
-        return $this->render('user/index.html.twig', ['users' => $userRepository->findAll()]);
+        $users = $this->commandBus->handle(new ListUsers('vigarcia@leadtech.com'));
+        return $this->render('user/index.html.twig', ['users' => $users]);
     }
 
     /**

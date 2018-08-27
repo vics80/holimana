@@ -1,11 +1,11 @@
 <?php
 
-namespace Holimana\Domain\Day;
+namespace Holimana\Domain\User;
 
 
 use Common\Domain\Collection;
 
-class DayCollection extends Collection
+class UserCollection extends Collection
 {
 
     protected function validateAdd($object)

@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use Holimana\Domain\User;
+use Holimana\Domain\User\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
