@@ -1,0 +1,25 @@
+Holimana\Domain\Coupon\Coupon:
+    type: entity
+    table: "`coupon`"
+    id:
+      id:
+        type: CouponId
+        length: 11
+        generator: { strategy: AUTO }
+        unsigned: true
+        primary: true
+    fields:
+      number:
+        type: string
+        nullable: false
+        length: 255
+        column: coupon_number
+    oneToOne:
+       order:
+        targetEntity: Holimana\Domain\Order\Order
+        cascade: ["all"]
+        inversedBy: coupon
+        #fetch: EAGER
+        joinColumn:
+          name: order_id
+          referencedColumnName: id

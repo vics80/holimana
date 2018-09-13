@@ -4,11 +4,11 @@ namespace Holimana\Domain\User;
 
 interface UserRepository
 {
-    public function findAll();
+    public function findAll(): UserCollection;
 
     public function findById(UserId $id): User;
 
-    public function findBy(array $criteria);
+    public function findBy(array $criteria): UserCollection;
 
-    public function persist(User $card);
+    public function persist(User $user);
 }

@@ -1,12 +1,14 @@
 Holimana\Domain\User\User:
   type: entity
-  table: "user"
+  table: "`user`"
+#  id:
+#    id:
+#      type: UserId
+#      length: 255
+#      primary: true
   id:
     id:
       type: UserId
-      length: 11
-      generator: { strategy: AUTO }
-      unsigned: true
       primary: true
   fields:
     firstname:
@@ -25,11 +27,21 @@ Holimana\Domain\User\User:
       type: string
       nullable: false
       length: 255
+    birthday:
+      type: datetime
+      nullable: false
   oneToMany:
     days:
       targetEntity: Holimana\Domain\Day\Day
-      cascade: ["all"]
       mappedBy: user
       joinColumn:
-        name:  id
+        name: id
         referencedColumnName: user_id
+  manyToOne:
+    role:
+      targetEntity: Holimana\Domain\Role\Role
+      cascade: ["all"]
+      inversedBy: users
+      joinColumn:
+        name: role_id
+        referencedColumnName: id

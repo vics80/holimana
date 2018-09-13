@@ -1,0 +1,35 @@
+Holimana\Domain\Order\Order:
+    type: entity
+    table: "`order`"
+    id:
+      id:
+        type: OrderId
+        length: 11
+        generator: { strategy: AUTO }
+        unsigned: true
+        primary: true
+    fields:
+      status:
+         type: integer
+         nullable: false
+         length: 1
+      alias:
+         type: string
+         nullable: false
+         length: 100
+    oneToOne:
+       coupon:
+        targetEntity: Holimana\Domain\Coupon\Coupon
+        cascade: ["all"]
+        mappedBy: order
+        joinColumn:
+          name: id
+          referencedColumnName: order_id
+    oneToMany:
+       transactions:
+        targetEntity: Holimana\Domain\Transaction\Transaction
+        cascade: ["all"]
+        mappedBy: order
+        joinColumn:
+          name: id
+          referencedColumnName: order_id

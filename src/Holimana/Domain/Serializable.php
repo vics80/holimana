@@ -1,6 +1,6 @@
 <?php
 
-namespace Itv\Domain;
+namespace Holimana\Domain;
 
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerBuilder;

@@ -2,74 +2,104 @@
 
 namespace Holimana\Domain\Day;
 
-use Doctrine\ORM\Mapping as ORM;
+use Holimana\Domain\User\User;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\DayRepository")
+ * Class Day
+ * @package Holimana\Domain\Day
  */
 class Day
 {
     /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
+     * @var DayId
      */
     private $id;
-
     /**
-     * @ORM\Column(type="date")
+     * @var \DateTime
      */
     private $date;
-
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="days")
-     * @ORM\JoinColumn(nullable=false)
+     * @var user
      */
-    private $User;
-
+    private $user;
     /**
-     * @ORM\Column(type="smallint")
+     * @var
      */
     private $status;
 
-    public function getId(): ?int
+    /**
+     * Day constructor.
+     * @param $id
+     * @param $date
+     * @param $user
+     * @param $status
+     */
+    public function __construct(
+        DayId $id,
+        \DateTime $date,
+        User $user,
+        $status
+    )
+    {
+        $this->id = $id;
+        $this->date = $date;
+        $this->user = $user;
+        $this->status = $status;
+    }
+
+    /**
+     * @return DayId
+     */
+    public function id(): DayId
     {
         return $this->id;
     }
 
-    public function getDate(): ?\DateTimeInterface
+    /**
+     * @return \DateTimeInterface
+     */
+    public function date(): \DateTimeInterface
     {
         return $this->date;
     }
 
-    public function setDate(\DateTimeInterface $date): self
+    /**
+     * @param \DateTimeInterface $date
+     */
+    public function setDate(\DateTimeInterface $date)
     {
         $this->date = $date;
-
-        return $this;
     }
 
-    public function getUser(): ?User
+    /**
+     * @return User
+     */
+    public function user(): User
     {
-        return $this->User;
+        return $this->user;
     }
 
-    public function setUser(?User $User): self
+    /**
+     * @param User $User
+     */
+    public function setUser(User $User)
     {
-        $this->User = $User;
-
-        return $this;
+        $this->user = $user;
     }
 
-    public function getStatus(): ?int
+    /**
+     * @return int
+     */
+    public function status(): int
     {
         return $this->status;
     }
 
-    public function setStatus(int $status): self
+    /**
+     * @param int $status
+     */
+    public function setStatus(int $status)
     {
         $this->status = $status;
-
-        return $this;
     }
 }

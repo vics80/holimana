@@ -2,9 +2,13 @@
 
 namespace Tests\Holimana\Domain;
 
+use Holimana\Domain\DomainEventPublisher;
+use Holimana\Domain\User\User;
 use Holimana\Domain\User\UserFactory;
 use Holimana\Domain\Day\DayCollectionFactory;
+use Holimana\Domain\User\UserId;
 use Holimana\Domain\User\UserIdFactory;
+use Holimana\Domain\User\UserInvalidArgumentsException;
 use PHPUnit\Framework\TestCase;
 
 class UserTest extends TestCase
@@ -17,12 +21,17 @@ class UserTest extends TestCase
     {
         $this->dayCollection = DayCollectionFactory::create();
         $this->userId = UserIdFactory::create();
-        $this->user = UserFactory::create(
+        $this->user = new User(
             $this->userId(),
             'Víctor',
             'Garcia',
             'victorvgm@gmail.com',
             'testpassword',
+            (new \DateTime())->setDate(
+                1980,
+                5,
+                3
+            ),
             $this->dayCollection()
         );
     }
@@ -36,8 +45,80 @@ class UserTest extends TestCase
         $this->assertSame('Víctor', $this->user()->firstname());
         $this->assertSame('Garcia', $this->user()->lastname());
         $this->assertSame('victorvgm@gmail.com', $this->user()->email());
-        $this->assertSame('testpassword', $this->user()->password());
+        $this->assertSame('testpassword', $this->user()->plainPassword());
         $this->assertSame($this->dayCollection(), $this->user()->days());
+    }
+
+    /**
+     * @test
+     * @expectedException \Holimana\Domain\User\UserInvalidArgumentsException
+     */
+    public function tryToCreateUserWithEmptyFirstname()
+    {
+        new User(
+            new UserId(),
+            null,
+            'lastname',
+            'an@email.com',
+            '1234',
+            new \DateTime()
+        );
+    }
+
+    /**
+     * @test
+     * @expectedException \Holimana\Domain\User\UserInvalidArgumentsException
+     * @dataProvider nonValidEmailProvider
+     */
+    public function tryToCreateUserWithNonValidEmail($email)
+    {
+        new User(
+            new UserId(),
+            'firstname',
+            'lastname',
+            $email,
+            '1234',
+            new \DateTime()
+        );
+    }
+
+    public function nonValidEmailProvider()
+    {
+        return [
+            ['example'],
+            ['example@'],
+            ['@example'],
+            ['example@example'],
+            ['example.com'],
+            ['example@.'],
+            ['@.'],
+            ['@example.com'],
+        ];
+    }
+
+    /**
+     * @test
+     * @expectedException \Holimana\Domain\User\UserInvalidArgumentsException
+     * @dataProvider nonValidLengthPasswordProvider
+     */
+    public function tryToCreateUserWithNonValidLengthPassword($password)
+    {
+        new User(
+            new UserId(),
+            'firstname',
+            'lastname',
+            'an@email.com',
+            $password,
+            new \DateTime()
+        );
+    }
+
+    public function nonValidLengthPasswordProvider()
+    {
+        return [
+            ['1234567'],
+            ['111111111111111111111111111111111']
+        ];
     }
 
     public function tryToAddDays()
@@ -45,19 +126,6 @@ class UserTest extends TestCase
 //        $user = $this->getUser();
 //        $user->setDays($user->days()->add);
     }
-
-    private function makeUser(): User
-    {
-        return new User(
-            '1',
-            'Víctor',
-            'Garcia',
-            'vigarcia@leadtech.com',
-            'testpassword',
-             $this->dayCollection()
-        );
-    }
-
 
     private function dayCollection()
     {

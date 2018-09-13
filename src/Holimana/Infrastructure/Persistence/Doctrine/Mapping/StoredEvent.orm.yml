@@ -1,0 +1,21 @@
+Holimana\Domain\StoredEvent:
+  type: entity
+  table: "stored_event"
+  id:
+    event_id:
+      type: integer
+      length: 11
+      generator: { strategy: AUTO }
+      unsigned: true
+      primary: true
+  fields:
+    event_body:
+      type: text
+      nullable: false
+    type_name:
+      type: string
+      nullable: false
+      length: 255
+    occurred_on:
+      type: datetime
+      nullable: false

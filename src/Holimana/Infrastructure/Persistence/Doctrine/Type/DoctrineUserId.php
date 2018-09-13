@@ -2,11 +2,11 @@
 
 namespace Holimana\Infrastructure\Persistence\Doctrine\Type;
 
-use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Types\StringType;
 use Holimana\Domain\User\UserId;
 
-class DoctrineUserId extends IntegerType
+class DoctrineUserId extends StringType
 {
     public function getName()
     {
@@ -16,7 +16,7 @@ class DoctrineUserId extends IntegerType
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
         /**@var UserId $value */
-        return !empty($value) ? $value->id() : null;
+        return $value instanceof UserId ? $value->id() : $value;
     }
 
     /**
@@ -27,6 +27,6 @@ class DoctrineUserId extends IntegerType
      */
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
-        return $value ? new UserId($value) : null;
+        return new UserId($value);
     }
 }

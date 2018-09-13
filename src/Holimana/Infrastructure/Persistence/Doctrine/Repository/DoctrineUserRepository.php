@@ -18,7 +18,7 @@ use Holimana\Domain\User\UserRepository;
 class DoctrineUserRepository extends DoctrineRepository implements UserRepository
 {
 
-    public function findAll()
+    public function findAll(): UserCollection
     {
         $result = $this->repository->findAll();
 
@@ -37,7 +37,7 @@ class DoctrineUserRepository extends DoctrineRepository implements UserRepositor
     }
 
 
-    public function findBy(array $criteria)
+    public function findBy(array $criteria): UserCollection
     {
         $result = $this->repository->findBy($criteria);
 
@@ -46,9 +46,9 @@ class DoctrineUserRepository extends DoctrineRepository implements UserRepositor
 
     }
 
-    public function persist(User $card)
+    public function persist(User $user)
     {
-        // TODO: Implement persist() method.
+        $this->insertOrUpdate($user);
     }
 
     protected function createQuery()

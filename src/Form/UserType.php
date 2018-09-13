@@ -2,10 +2,14 @@
 
 namespace App\Form;
 
-use Holimana\Domain\User;
+use Holimana\Domain\Role\Role;
+use Holimana\Domain\User\User;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\FormInterface;
 
 class UserType extends AbstractType
 {
@@ -15,14 +19,20 @@ class UserType extends AbstractType
             ->add('firstname')
             ->add('lastname')
             ->add('email')
-            ->add('password')
+            ->add('password', PasswordType::class)
+            ->add(
+                'role',
+                EntityType::class,
+                [
+                    'class' => Role::class,
+                    'choice_label' => 'name'
+                ]
+            )
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
-            'data_class' => User::class,
-        ]);
+
     }
 }

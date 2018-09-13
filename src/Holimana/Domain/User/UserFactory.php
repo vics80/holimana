@@ -19,6 +19,7 @@ class UserFactory
         $lastname,
         $email,
         $password,
+        \DateTime $birthday,
         DayCollection $dayCollection = null
     )
     {
@@ -28,6 +29,7 @@ class UserFactory
             $lastname,
             $email,
             $password,
+            $birthday,
             $dayCollection
         );
     }

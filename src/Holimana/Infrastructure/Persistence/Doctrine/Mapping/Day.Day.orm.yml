@@ -1,12 +1,14 @@
 Holimana\Domain\Day\Day:
   type: entity
   table: "`day`"
+#  id:
+#    id:
+#      type: DayId
+#      length: 255
+#      primary: true
   id:
     id:
       type: DayId
-      length: 11
-      generator: { strategy: AUTO }
-      unsigned: true
       primary: true
   fields:
     date:
@@ -16,11 +18,11 @@ Holimana\Domain\Day\Day:
       type: smallint
       nullable: false
       length: 1
-  ManyToOne:
-    days:
+
+  manyToOne:
+    user:
       targetEntity: Holimana\Domain\User\User
-      cascade: ["all"]
       inversedBy: days
       joinColumn:
-        name:  day_id
+        name: user_id
         referencedColumnName: id

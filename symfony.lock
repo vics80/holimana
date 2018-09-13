@@ -1,4 +1,7 @@
 {
+    "beberlei/assert": {
+        "version": "v3.0.0"
+    },
     "doctrine/annotations": {
         "version": "1.0",
         "recipe": {
@@ -116,6 +119,9 @@
     "league/tactician-container": {
         "version": "2.0.0"
     },
+    "league/tactician-doctrine": {
+        "version": "v1.1.1"
+    },
     "league/tactician-logger": {
         "version": "v0.10.0"
     },
@@ -193,6 +199,9 @@
     },
     "psr/simple-cache": {
         "version": "1.0.1"
+    },
+    "respect/validation": {
+        "version": "1.1.25"
     },
     "rhumsaa/uuid": {
         "version": "2.8.2"

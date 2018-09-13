@@ -30,17 +30,29 @@ services:
         resource: '../src/Controller'
         tags: ['controller.service_arguments']
 
+    App\EventListener\RequestListener:
+        tags:
+        - { name: kernel.event_listener, event: kernel.request }
+        arguments: ['@Holimana\Domain\DomainEventPublisher']
+
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    ##################
+    ###--SERVICES--###
+    ##################
+    Holimana\Application\Service\PasswordHasher:
+        class: Holimana\Infrastructure\Service\SymfonyPasswordHasher
 
     #########################
     ###--EVENT PUBLISHER--###
     #########################
-    Holimana\Infrastructure\Event\DomainEventPublisher:
-        class: Holimana\Infrastructure\Event\DomainEventPublisher
+    Holimana\Domain\DomainEventPublisher:
+        class: Holimana\Domain\DomainEventPublisher
 #        arguments: ['@Holimana\Infrastructure\Event\EventProducerFactory', '%env(QUEUE_SERVICE)%']
-#        calls:
-#        - ['subscribe', ['@Itv\Application\DomainEvent\OrderCreatedSubscriber']]
+        calls:
+        - ['subscribe', ['@Holimana\Domain\PersistDomainEventSubscriber']]
 #        - ['subscribe', ['@Itv\Application\DomainEvent\CompanyAffiliationChangedSubscriber']]
 
     #########################
@@ -49,7 +61,12 @@ services:
     Holimana\Infrastructure\Persistence\Doctrine\Repository\DoctrineUserRepository:
         class: Holimana\Infrastructure\Persistence\Doctrine\Repository\DoctrineUserRepository
         autowire: true
-        arguments: ['@doctrine.orm.default_entity_manager', '@Holimana\Infrastructure\Event\DomainEventPublisher']
+        arguments: ['@doctrine.orm.default_entity_manager']
+
+    Holimana\Infrastructure\Persistence\Doctrine\Repository\DoctrineDayRepository:
+        class: Holimana\Infrastructure\Persistence\Doctrine\Repository\DoctrineDayRepository
+        autowire: true
+        arguments: ['@doctrine.orm.default_entity_manager']
 
 
     #########################
@@ -61,3 +78,42 @@ services:
         - { name: tactician.handler, typehints: true }
         arguments:
         - '@Holimana\Infrastructure\Persistence\Doctrine\Repository\DoctrineUserRepository'
+
+    holimana.user.find_user_handler:
+        class: Holimana\Application\Command\User\FindUserHandler
+        tags:
+        - { name: tactician.handler, typehints: true }
+        arguments:
+        - '@Holimana\Infrastructure\Persistence\Doctrine\Repository\DoctrineUserRepository'
+
+    holimana.user.update_user_handler:
+        class: Holimana\Application\Command\User\UpdateUserHandler
+        tags:
+        - { name: tactician.handler, typehints: true }
+        arguments:
+        - '@Holimana\Infrastructure\Persistence\Doctrine\Repository\DoctrineUserRepository'
+
+    holimana.user.create_user_handler:
+        class: Holimana\Application\Command\User\CreateUserHandler
+        tags:
+        - { name: tactician.handler, typehints: true }
+        arguments:
+        - '@Holimana\Infrastructure\Persistence\Doctrine\Repository\DoctrineUserRepository'
+        - '@Holimana\Application\Service\PasswordHasher'
+
+
+    ##################################
+    ###--DOCTRINE EVENT STORE--###
+    ##################################
+    Holimana\Infrastructure\Application\DoctrineEventStore:
+        class: Holimana\Infrastructure\Application\DoctrineEventStore
+        arguments:
+        - '@doctrine.orm.default_entity_manager'
+
+    ##################################
+    ###--DOMAIN EVENT SUBSCRIBERS--###
+    ##################################
+    Holimana\Domain\PersistDomainEventSubscriber:
+        class: Holimana\Domain\PersistDomainEventSubscriber
+        arguments:
+        - '@Holimana\Infrastructure\Application\DoctrineEventStore'

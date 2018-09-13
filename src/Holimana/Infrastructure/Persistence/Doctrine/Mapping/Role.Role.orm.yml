@@ -1,0 +1,25 @@
+Holimana\Domain\Role\Role:
+  type: entity
+  table: "`role`"
+#  id:
+#    id:
+#      type: RoleId
+#      length: 255
+#      primary: true
+  id:
+    id:
+      type: RoleId
+      primary: true
+  fields:
+    name:
+      type: string
+      nullable: false
+
+  oneToMany:
+    users:
+      targetEntity: Holimana\Domain\User\User
+      cascade: ["all"]
+      mappedBy: role
+      joinColumn:
+        name: id
+        referencedColumnName: role_id

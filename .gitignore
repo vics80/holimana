@@ -21,3 +21,8 @@
 
 
 /.idea
+
+##Docker logs
+docker/logs
+
+public/var/log

@@ -1,0 +1,22 @@
+Holimana\Domain\Transaction\Transaction:
+    type: entity
+    table: "`transaction`"
+    id:
+      id:
+        type: TransactionId
+        unsigned: true
+        length: 11
+        generator: { strategy: AUTO }
+    fields:
+      transactionNumber:
+          type: string
+          length: 100
+          nullable: false
+    manyToOne:
+      order:
+       targetEntity: Holimana\Domain\Order\Order
+       inversedBy: transactions
+       cascade: ["all"]
+       joinColumn:
+         name: order_id
+         referencedColumnName: id

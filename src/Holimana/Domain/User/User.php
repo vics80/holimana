@@ -2,57 +2,74 @@
 
 namespace Holimana\Domain\User;
 
+use Assert\Assert;
+use Assert\Assertion;
+use Assert\InvalidArgumentException;
 use Common\Domain\Collection;
+use Holimana\Domain\DomainEventPublisher;
+use Holimana\Domain\Entity;
+use Holimana\Domain\Role\Role;
+use Respect\Validation\Validator;
 
-class User
+class User extends Entity
 {
-    private $id;
     private $firstname;
     private $lastname;
     private $email;
+    private $plainPassword;
     private $password;
     private $days;
+    private $birthday;
+    /**
+     * @var Role
+     */
+    private $role;
+
 
     /**
      * User constructor.
-     * @param $id
+     * @param UserId|null $id
      * @param $firstname
      * @param $lastname
      * @param $email
-     * @param $password
-     * @param $days
+     * @param $plainPassword
+     * @param \Datetime $birthday
+     * @param Collection|null $days
+     * @param Role $role
      */
     public function __construct(
-        $id,
+        UserId $id = null,
         $firstname,
-        $lastname,
+        $lastname = null,
         $email,
-        $password,
-        Collection $days = null
+        $plainPassword,
+        \Datetime $birthday,
+        Collection $days = null,
+        Role $role = null
     )
     {
-        $this->setId($id);
+        $this->id = $id;
         $this->setFirstname($firstname);
-        $this->setLastname($lastname);
+        $this->lastname = $lastname;
         $this->setEmail($email);
-        $this->setPassword($password);
+        $this->setPlainPassword($plainPassword);
+        $this->birthday = $birthday;
         $this->setDays($days);
+        $this->role = $role;
+
+        DomainEventPublisher::instance()->publish(
+            new UserCreated(
+                $this
+            )
+        );
     }
 
     /**
-     * @return mixed
+     * @return UserId
      */
     public function id()
     {
         return $this->id;
-    }
-
-    /**
-     * @param mixed $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
     }
 
     /**
@@ -68,6 +85,10 @@ class User
      */
     public function setFirstname($firstname)
     {
+        Assert::lazy()
+            ->that($firstname, 'firstname')
+            ->setExceptionClass(UserInvalidArgumentsException::class)
+            ->verifyNow();
         $this->firstname = $firstname;
     }
 
@@ -100,7 +121,33 @@ class User
      */
     public function setEmail($email)
     {
+        Assert::lazy()
+            ->that($email, 'valid email')
+            ->setExceptionClass(UserInvalidArgumentsException::class)
+            ->verifyNow();
         $this->email = $email;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function plainPassword()
+    {
+        return $this->plainPassword;
+    }
+
+    /**
+     * @param $plainPassword
+     */
+    public function setPlainPassword($plainPassword)
+    {
+        Assert::lazy()
+            ->that($plainPassword, 'length')
+            ->betweenLength(8,32)
+            ->setExceptionClass(UserInvalidArgumentsException::class)
+            ->verifyNow();
+        $this->plainPassword = $plainPassword;
     }
 
     /**
@@ -120,6 +167,22 @@ class User
     }
 
     /**
+     * @return \Datetime
+     */
+    public function birthday(): \Datetime
+    {
+        return $this->birthday;
+    }
+
+    /**
+     * @param \DateTime $birthday
+     */
+    public function setBirthday(\DateTime $birthday)
+    {
+        $this->birthday = $birthday;
+    }
+
+    /**
      * @return Collection
      */
     public function days()
@@ -133,5 +196,21 @@ class User
     public function setDays($days)
     {
         $this->days = $days;
+    }
+
+    /**
+     * @return Role
+     */
+    public function role(): Role
+    {
+        return $this->role;
+    }
+
+    /**
+     * @param Role $role
+     */
+    public function setRole(Role $role)
+    {
+        $this->role = $role;
     }
 }

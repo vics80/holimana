@@ -8,23 +8,59 @@ parameters:
 doctrine:
     dbal:
         # configure these for your database server
-        driver: 'pdo_mysql'
-        server_version: '5.7'
-        charset: utf8mb4
-        default_table_options:
-            charset: utf8mb4
-            collate: utf8mb4_unicode_ci
-
-        url: '%env(resolve:DATABASE_URL)%'
+        default_connection: default
+        connections:
+            default:
+                driver: 'pdo_mysql'
+                server_version: '5.7'
+                charset: utf8mb4
+                default_table_options:
+                    charset: utf8mb4
+                    collate: utf8mb4_unicode_ci
+                url: '%env(resolve:DATABASE_URL)%'
         types:
             UserId: Holimana\Infrastructure\Persistence\Doctrine\Type\DoctrineUserId
+            DayId: Holimana\Infrastructure\Persistence\Doctrine\Type\DoctrineDayId
+            RoleId: Holimana\Infrastructure\Persistence\Doctrine\Type\DoctrineRoleId
+            OrderId: Holimana\Infrastructure\Persistence\Doctrine\Type\DoctrineOrderId
+            CouponId: Holimana\Infrastructure\Persistence\Doctrine\Type\DoctrineCouponId
+            TransactionId: Holimana\Infrastructure\Persistence\Doctrine\Type\DoctrineTransactionId
+#    orm:
+#        auto_generate_proxy_classes: '%kernel.debug%'
+#        naming_strategy: doctrine.orm.naming_strategy.underscore
+#        auto_mapping: false
+#        mappings:
+#            App:
+#                is_bundle: false
+#                type: yml
+#                dir: '%kernel.project_dir%/src/Holimana/Infrastructure/Persistence/Doctrine/Mapping'
+#                prefix: 'Holimana\Domain'
     orm:
+        default_entity_manager:   default
         auto_generate_proxy_classes: '%kernel.debug%'
-        naming_strategy: doctrine.orm.naming_strategy.underscore
-        auto_mapping: true
-        mappings:
-            App:
-                is_bundle: false
-                type: yml
-                dir: '%kernel.project_dir%/src/Holimana/Infrastructure/Persistence/Doctrine/Mapping'
-                prefix: 'Holimana\Domain'
+        entity_managers:
+            default:
+#                metadata_cache_driver: redis
+#                query_cache_driver: redis
+#                result_cache_driver: redis
+                naming_strategy: doctrine.orm.naming_strategy.underscore
+                quote_strategy:  doctrine.orm.quote_strategy.default
+                auto_mapping: false
+                connection: default
+                mappings:
+                    App:
+                        is_bundle: false
+                        type: yml
+                        dir: '%kernel.project_dir%/src/Holimana/Infrastructure/Persistence/Doctrine/Mapping'
+                        prefix: 'Holimana\Domain'
+#            events:
+#                naming_strategy: doctrine.orm.naming_strategy.underscore
+#                quote_strategy:  doctrine.orm.quote_strategy.default
+#                auto_mapping: false
+#                connection: events
+#                mappings:
+#                    App:
+#                        is_bundle: false
+#                        type: yml
+#                        dir: '%kernel.project_dir%/src/Holimana/Infrastructure/Persistence/Doctrine/Mapping'
+#                        prefix: 'Holimana\Domain'

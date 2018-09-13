@@ -6,6 +6,7 @@ namespace Holimana\Infrastructure\Persistence\Doctrine\Repository;
 use function Couchbase\defaultDecoder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Doctrine\ORM\EntityRepository;
 use Holimana\Domain\DomainRepository;
@@ -48,14 +49,14 @@ abstract class DoctrineRepository implements DomainRepository
      */
     public function __construct(
         EntityManager $entityManager,
-        EventPublisher $eventPublisher,
+        //EventPublisher $eventPublisher,
         LoggerInterface $logger
     )
     {
         $this->entityManager = $entityManager;
         $this->repository = $this->entityManager->getRepository($this->getEntityClassName());
         $this->table = $this->entityManager->getClassMetadata($this->getEntityClassName())->getTableName();
-        $this->eventPublisher = $eventPublisher;
+        //$this->eventPublisher = $eventPublisher;
         $this->exists = false;
         $this->logger = $logger;
     }
@@ -142,6 +143,35 @@ abstract class DoctrineRepository implements DomainRepository
         }
     }
 
+    /**
+     * @param Entity $entity
+     * @return Entity
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function update(Entity $entity)
+    {
+        if (!$this->entityManager->isOpen()) {
+            $this->entityManager = $this->entityManager->create(
+                $this->entityManager->getConnection(),
+                $this->entityManager->getConfiguration()
+            );
+        }
+
+        $this->entityManager->merge($entity);
+        $this->entityManager->flush();
+
+        return $entity;
+    }
+
+    public function insert(Entity $entity)
+    {
+        $this->entityManager->persist($entity);
+        $this->entityManager->flush();
+
+        return $entity;
+    }
+
     abstract protected function getEntityClassName();
 
     abstract protected function getCollectionClassName();
@@ -154,29 +184,9 @@ abstract class DoctrineRepository implements DomainRepository
      */
     protected function insertOrUpdate(Entity $entity)
     {
-        if (!$this->entityManager->isOpen()) {
-            $this->entityManager = $this->entityManager->create(
-                $this->entityManager->getConnection(),
-                $this->entityManager->getConfiguration()
-            );
-        }
-
-        $entity->setUpdatedAt(new \DateTime('now'));
-
-        if ($this->haveId($entity)) {
-            $this->exists = true;
-            $this->entityManager->merge($entity);
-        } else {
-            $entity->setCreatedAt(new \DateTime('now'));
-            $this->entityManager->persist($entity);
-        }
-
+        /** TODO: Always try to insert, updates pending */
+        $this->entityManager->persist($entity);
         $this->entityManager->flush();
-
-        if ($this->transactionMode) {
-            $this->entityManager->commit();
-            $this->transactionMode = false;
-        }
     }
 
     protected function haveId(Entity $entity)
@@ -249,5 +259,6 @@ abstract class DoctrineRepository implements DomainRepository
 
         return $collection;
     }
+
 
 }

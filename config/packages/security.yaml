@@ -1,4 +1,6 @@
 security:
+    encoders:
+        App\Security\NullUser: bcrypt
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
         in_memory: { memory: ~ }
